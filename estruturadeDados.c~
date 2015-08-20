@@ -54,7 +54,6 @@ int main(){
 					*	a função cadastrarNumero() é chamada sem atribuir nada à ninguém
 					*	pois ela retorna NULL se cadastrar uma pessoa qualquer além da
 					*	raiz mais acenstral. Ao final, o ponteiro "P" é desalocado.
-					*	(Olhar método cadastrarNumero() e documentação dele na header estruturadeDados.h)
 					*************************************************************************/
 					Pessoa P = malloc(sizeof(struct pessoa));
 					do{
@@ -82,7 +81,6 @@ int main(){
 					*	local para onde deverá apontar na memória. Após isso, o if-else 
 					*	decidirá qual informação retornar ao usuário. Ao final, o ponteiro 
 					*	"P" é desalocado.
-					*	(Olhar método e search() documentação dele na header estruturadeDados.h)
 					***************************************************************************/
 					int tel;
 					printf("Insira o número para pesquisar.\n");
@@ -98,18 +96,6 @@ int main(){
 					free(P);
 					break;
 				case 3:
-					/***************************************************************************
-					*	O usuário entrará com um telefone que será removido da estrutura. A 
-					*	condição if-else decidirá se determinado número se encontra na árvo-
-					*	re. Se estiver presente, a função removerNumero() será chamada. A
-					*	variável auxiliar do tipo Pessoa irá receber o valor de retorno da 
-					*	função removerNumero() e logo após será verificado se é NULL ou não.
-					*	A função removerNumero() retorna NULL se o nó removido na árvore não
-					*	é a raiz mais ancestral possível, ou origem. Se não for NULL, o pon-
-					*	teiro "root" irá receber o aux, pois a raiz mais ancestral foi removi-
-					*	da e precisa-se que o root do código no main seja atualizado.
-					*	(Olhar método removerNumero() e documentação dele na header estruturadeDados.h)
-					****************************************************************************/
 					printf("Insira um número para ser removido.\n");
 					scanf("%d%*c", &tel);
 					if(search(root, tel) == NULL) printf("Pessoa não cadastrada!\n");
@@ -119,7 +105,6 @@ int main(){
 					}
 					break;
 				case 4:;
-					//	O usuário irá entrar com o tipo de percurso que ele quer observar.
 					int op;
 					printf("Selecione uma opção de listagem.\n");
 					printf("<1> Percurso em pré-ordem.\n");
