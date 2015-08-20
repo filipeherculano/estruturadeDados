@@ -78,7 +78,7 @@ Pessoa cadastrarNumero(Pessoa P, Pessoa root, int isFirst){
 				será retornada a nova raiz mais ancestral. Se a estrutura removida
 				for qualquer outra, será retornado NULL
 
-	Este método também é recursivo em algumas condições, porém a primeira instância é
+	Este método também é recursivo em algumas condições, porém à primeira instância é
 	verificado logo se a raiz mais ancestral ou uma de suas filhas é a estrutura à ser
 	removida, se for este irá entrar em uma das 3 condições do início. Todas as 3 possuem
 	o mesmo do-while que é relacionado com a condição de resposta Sim ou Não do usuário
