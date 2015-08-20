@@ -72,6 +72,7 @@ int main(){
  					else cadastrarNumero(P, root, isFirst);
 					isFirst = 0;
 					free(P);
+					P = NULL;
 					break;
 				case 2: ;
 					/***************************************************************************
@@ -96,6 +97,7 @@ int main(){
 						printf("Telefone: %d\n\n", P->telefone);
 					} else printf("\t->Pessoa não cadastrada!\n");
 					free(P);
+					P = NULL;
 					break;
 				case 3:
 					/***************************************************************************
