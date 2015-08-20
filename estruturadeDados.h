@@ -40,7 +40,7 @@ typedef struct pessoa *Pessoa;
 *	tura. Se não, é verificado se o valor telefone é menor ou maior que o valor 
 *	no nó em questão. Se for maior ou menor e os ponteiros para os lados esquerdos
 *	e direitos forem NULL (Podem ser alocadas novos cadastros), então é ligado o 
-*	ponteiro *esq da strutura acima ao ponteiro que aponta para a nova estrutura 
+*	ponteiro *esq ou *dir da strutura acima ao ponteiro que aponta para a nova estrutura 
 *	retornando assim NULL. Se os valores menores ou maiores não forem NULL (Existe
 *	um nó filho) é chamado o mesmo método cadastrarNumero() dando assim um caráter
 *	recursivo. Essa nova chamada receberá os mesmos parâmetros, porém agora com
@@ -71,43 +71,43 @@ Pessoa cadastrarNumero(Pessoa P, Pessoa root, int isFirst){
 }
 
 /********************************************************************************************
-	Parâmetros:	Ponteiro para estrutura à ser removida = P
-				Ponteiro para raiz mais ancestral = root
-				Ponteiro para raiz auxiliar que começa como root = auxRoot
-	Return:		Se a estrutura removida for a raiz mais ancestral, então ao final
-				será retornada a nova raiz mais ancestral. Se a estrutura removida
-				for qualquer outra, será retornado NULL
-
-	Este método também é recursivo em algumas condições, porém à primeira instância é
-	verificado logo se a raiz mais ancestral ou uma de suas filhas é a estrutura à ser
-	removida, se for este irá entrar em uma das 3 condições do início. Todas as 3 possuem
-	o mesmo do-while que é relacionado com a condição de resposta Sim ou Não do usuário
-	em relação à remoção ou não da estrutura. 
-
-	Na primeira seção, é usado dois ponteiros auxiliares para as filhas do auxRoot atual 
-	para que possamos cadastrar o ramo direito usando o ramo esquerdo (Escolha feita 
-	aleatóriamente, não interfere na corretude) como nova raiz acenstral mais antiga. 
-	Ao final, é usando cadastrarNumero() com novos parâmetros. É retornado assim a nova
-	raiz ancestral.
-
-	Na segunda seção, o telefone procurado é igual à filha esquerda da raiz. A ligação
-	para a filha esquerda é anulada com NULL, é usado um ponteiro auxiliar para pegar 
-	o endereço da filha esquerda na memória para poder manipulá-la. É usado agora a 
-	função cadastrarNumero() duas vezes: uma para cadastrar a filha esquerda da filha
-	esquerda da raiz que estávamos na raiz mais ancestral da árvore e uma para cadastrar
-	a filha direita da filha esquerda que estávamos na raiz mais ancestral da árvore.
-	Retorna-se NULL.
-
-	Na terceira seção, é praticamente a mesma coisa da segunda. Sendo que agora será feito
-	com o valor procurado do telefone sendo igual à filha direita da raiz que estamos.
-
-	As duas últimas seções são a parte recursiva do método. Só são ativados, se a raiz atual
-	não é igual ao valor telefone ou as filhas desta também não possuem esse número. Logo,
-	é chamado removerNumero() novamente, sendo que agora com o terceiro parâmetro sendo a 
-	filha esquerda ou direita da raiz atual. 
-
-	A função continua até remover o dado telefone pois a verificação se existe ou não o 
-	número procurado é feita antes de entrar neste método, usando search().
+*	Parâmetros:	Ponteiro para estrutura à ser removida = P
+*				Ponteiro para raiz mais ancestral = root
+*				Ponteiro para raiz auxiliar que começa como root = auxRoot
+*	Return:		Se a estrutura removida for a raiz mais ancestral, então ao final
+*				será retornada a nova raiz mais ancestral. Se a estrutura removida
+*				for qualquer outra, será retornado NULL
+*
+*	Este método também é recursivo em algumas condições, porém à primeira instância é
+*	verificado logo se a raiz mais ancestral ou uma de suas filhas é a estrutura à ser
+*	removida, se for este irá entrar em uma das 3 condições do início. Todas as 3 possuem
+*	o mesmo do-while que é relacionado à condição de resposta Sim ou Não do usuário
+*	em relação à remoção ou não da estrutura. 
+*
+*	Na primeira seção, é usado dois ponteiros auxiliares para as filhas do auxRoot atual 
+*	para que possamos cadastrar o ramo direito usando o ramo esquerdo (Escolha feita 
+*	aleatóriamente, não interfere na corretude) como nova raiz acenstral mais antiga. 
+*	Ao final, é usando cadastrarNumero() com novos parâmetros. É retornado assim a nova
+*	raiz ancestral. Essa primeira condição se refere à possibilidade de a raiz mais acima
+*	ser a eliminada.
+*	
+*	Na segunda seção, o telefone procurado é igual à filha esquerda da raiz. A ligação
+*	para a filha esquerda é anulada com NULL, é usado um ponteiro auxiliar para pegar 
+*	o endereço da filha esquerda na memória para poder manipulá-la. É usado agora a 
+*	função cadastrarNumero() duas vezes: uma para cadastrar a filha esquerda da filha
+*	esquerda da raiz da árvore e uma para cadastrar a filha direita da filha esquerda 
+* 	da raiz mais ancestral da árvore. Retorna-se NULL.
+*
+*	Na terceira seção, é praticamente a mesma coisa da segunda. Sendo que agora será feito
+*	com o valor procurado do telefone sendo igual à filha direita da raiz que estamos.
+*
+*	As duas últimas seções são a parte recursiva do método. Só são ativados, se a raiz atual
+*	não é igual ao valor telefone, ou as filhas desta também não possuem esse número. Logo,
+*	é chamado removerNumero() novamente, sendo que agora com o terceiro parâmetro sendo a 
+*	filha esquerda ou direita da raiz atual. 
+*
+*	A função continua até remover o dado telefone, pois a verificação de existência ou não do 
+*	número procurado é feita antes de entrar neste método, usando search().
 *******************************************************************************************/
 
 Pessoa removerNumero(Pessoa root, Pessoa P, Pessoa auxRoot){
