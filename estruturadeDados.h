@@ -13,13 +13,21 @@
 *						Author - Filipe Herculano Rocha
 ***********************************************************************************************/
 
+/**********************************************************************************
+*	Glossário: 	Ancestral Mais Antigo = raiz no nível mais alto da árvore binária.
+*				Raiz Atual = raiz na qual estamos considerando como root no momento 
+*				   em questão, pode ser ou não o ancestral mais antigo.
+*				Ramo Esquerdo = filha esquerda da raiz atual.
+*				Ramo Direito = filha direita da raiz atual.
+***********************************************************************************/
+
 /********************************************************************************
 *	Uma estrutura é criada com todas as informações inerentes à cada indivíduo.
 *	Assim como um typedef para referenciar um ponteiro para a estrutura, facili-
 *	tando assim a passagem de parâmetros.
 *********************************************************************************/
 struct pessoa{
-	int rg;
+	long long rg;
 	int telefone;
 	char *email;
 	char *nome;
@@ -29,26 +37,32 @@ struct pessoa{
 
 typedef struct pessoa *Pessoa;
 
-/***********************************************************************************
-*	Parâmetros: Ponteiro para a estrutura que será adicionada = P
-*				Ponteiro para a estrutura raiz mais ancestral da árvore = root
-*				Booleano para identificar quando retornar um NULL ou não = isFirst
+/*************************************************************************************
+*	Parâmetros: P = Ponteiro para a estrutura que será adicionada
+*				root = Ponteiro para a estrutura raiz mais ancestral da árvore
+*				isFirst = Booleano para identificar quando retornar um NULL ou não
+*
 *	Return:		Quando é o primeiro cadastro ele retorna o ponteiro que referencia
 *				ele. Retorna NULL quando é outro além deste.
 *
-*	Se a variável booleana for verdadeira, é retornado o ponteiro para essa estru-
-*	tura. Se não, é verificado se o valor telefone é menor ou maior que o valor 
-*	no nó em questão. Se for maior ou menor e os ponteiros para os lados esquerdos
-*	e direitos forem NULL (Podem ser alocadas novos cadastros), então é ligado o 
-*	ponteiro *esq ou *dir da strutura acima ao ponteiro que aponta para a nova estrutura 
-*	retornando assim NULL. Se os valores menores ou maiores não forem NULL (Existe
-*	um nó filho) é chamado o mesmo método cadastrarNumero() dando assim um caráter
-*	recursivo. Essa nova chamada receberá os mesmos parâmetros, porém agora com
-*	o parâmetro que antes era root, agora será uma das duas filhas. Se o valor 
-*	telefone é igual ao do nó em questão, é printado ao usuário a informação de
-*	que já existe e é retornado NULL.
-***********************************************************************************/
+*	Na função abaixo, existe dois tipos de retorno: Pessoa e NULL.
+*
+*	Quando ele retorna uma Pessoa, quer dizer que ele cadastrou o primeiro usuário 
+*	da árvore. Porém, para isso ele precisa referênciar o usuário mais ancestral no 
+*	nosso código main(). Por esse motivo, ele retorna o ponteiro P para quem a chamou
+*	e lá nós atribuímos ao novo root.
+*
+*	Quando ele retorna NULL, isso significa que ele cadastrou alguém que não é mais o 
+*	ancestral mais antigo da árvore binária. Porém, antes de cadastrar precisamos saber 
+*	se o o novo nó possui um valor menor ou maior que o valor contido na raiz atual. 
+*	Depois disso, verificamos se o ramo esquerdo ou direito aponta para NULL, se apontar
+*	só é preciso alocar o novo nó neste ramo. Se não for NULL, é usado a mesma função 
+*	de cadastrarNumero(), porém agora com um novo valor para a raiz atual, dependendo 
+*	de qual lado que ele for.
+***************************************************************************************/
 Pessoa cadastrarNumero(Pessoa P, Pessoa root, int isFirst){
+	if(P == NULL) return NULL;
+
 	if(isFirst) {
 		printf("Raiz cadastrada com sucesso.\n");
 		return P;
@@ -70,45 +84,36 @@ Pessoa cadastrarNumero(Pessoa P, Pessoa root, int isFirst){
 	return NULL;
 }
 
-/********************************************************************************************
-*	Parâmetros:	Ponteiro para estrutura à ser removida = P
-*				Ponteiro para raiz mais ancestral = root
-*				Ponteiro para raiz auxiliar que começa como root = auxRoot
+/***********************************************************************************************
+*	Parâmetros:	P = Ponteiro para estrutura à ser removida
+*				root = Ponteiro para raiz mais ancestral
+*				auxRoot = Ponteiro para raiz auxiliar que começa como root
 *	Return:		Se a estrutura removida for a raiz mais ancestral, então ao final
 *				será retornada a nova raiz mais ancestral. Se a estrutura removida
 *				for qualquer outra, será retornado NULL
 *
-*	Este método também é recursivo em algumas condições, porém à primeira instância é
-*	verificado logo se a raiz mais ancestral ou uma de suas filhas é a estrutura à ser
-*	removida, se for este irá entrar em uma das 3 condições do início. Todas as 3 possuem
-*	o mesmo do-while que é relacionado à condição de resposta Sim ou Não do usuário
-*	em relação à remoção ou não da estrutura. 
+*	Neste método, também são retornados duas coisas: Pessoa ou NULL.
 *
-*	Na primeira seção, é usado dois ponteiros auxiliares para as filhas do auxRoot atual 
-*	para que possamos cadastrar o ramo direito usando o ramo esquerdo (Escolha feita 
-*	aleatóriamente, não interfere na corretude) como nova raiz acenstral mais antiga. 
-*	Ao final, é usando cadastrarNumero() com novos parâmetros. É retornado assim a nova
-*	raiz ancestral. Essa primeira condição se refere à possibilidade de a raiz mais acima
-*	ser a eliminada.
-*	
-*	Na segunda seção, o telefone procurado é igual à filha esquerda da raiz. A ligação
-*	para a filha esquerda é anulada com NULL, é usado um ponteiro auxiliar para pegar 
-*	o endereço da filha esquerda na memória para poder manipulá-la. É usado agora a 
-*	função cadastrarNumero() duas vezes: uma para cadastrar a filha esquerda da filha
-*	esquerda da raiz da árvore e uma para cadastrar a filha direita da filha esquerda 
-* 	da raiz mais ancestral da árvore. Retorna-se NULL.
+*	A Pessoa auxRoot começa sendo o mesmo de root, sendo que ao longo do método é ele quem 
+*	vai ser usado para iterar novos valores de raiz e a Pessoa root vai ser sempre a raiz mais 
+*	ancestral, só mudando quando esta é removida.
 *
-*	Na terceira seção, é praticamente a mesma coisa da segunda. Sendo que agora será feito
-*	com o valor procurado do telefone sendo igual à filha direita da raiz que estamos.
+*	É retornado Pessoa quando o nó removido é o ancestral mais antigo. Neste caso, é usado dois 
+*	auxiliares para pegar tanto o ramo esquerdo como direito do raiz atual. Escolhi que o ramo 
+*	direito vai ser sempre o ramo que vai se tornar a raiz mais ancestral, poderia ter sido o 
+*	esquerdo. Após a referenciação dos ramos, é usado um aux para pegar a nova raiz mais ancestral
+*	(por convenção é a direita) e chamamos o método cadastrarNumero() usando o ramo esquerdo 
+*	pegue anteriormente e inserido no ramo direito, agora chamado de auxRoot.
 *
-*	As duas últimas seções são a parte recursiva do método. Só são ativados, se a raiz atual
-*	não é igual ao valor telefone, ou as filhas desta também não possuem esse número. Logo,
-*	é chamado removerNumero() novamente, sendo que agora com o terceiro parâmetro sendo a 
-*	filha esquerda ou direita da raiz atual. 
+*	Caso a remoção não seja no ancestral mais antigo, haverá as opções de que o lado esquerdo ou o
+*	lado direito sejam os valores procurados. Se forem, é usado um auxiliar para pegar o ramo em 
+*	questão e após isso é iterado para que os ramos filhos do ramo que foi pegue sejam adicionados 
+*	na raiz mais ancestral. Também usando cadastrarNumero(). A ligação para o ramo que foi removido
+*	é anulada.
 *
-*	A função continua até remover o dado telefone, pois a verificação de existência ou não do 
-*	número procurado é feita antes de entrar neste método, usando search().
-*******************************************************************************************/
+*	Em um último caso, se o valor continua sendo não encontrado, o valor auxRoot é atualizado se 
+*	encaminhando para um dos lados: esquerdo ou direito.
+*************************************************************************************************/
 
 Pessoa removerNumero(Pessoa root, Pessoa P, Pessoa auxRoot){
 	if(auxRoot->telefone == P->telefone) {
@@ -116,9 +121,9 @@ Pessoa removerNumero(Pessoa root, Pessoa P, Pessoa auxRoot){
 		do{
 			printf("Nome : %s", P->nome);
 			printf("Email: %s", P->email);
-			printf("RG: %d\n\n", P->rg);
+			printf("RG: %lld\n\n", P->rg);
 			printf("Pessoa achada, deseja realmente removê-la? <s> sim ou <n> não.\n");
-			scanf("%c", &c);
+			scanf("%c%*c", &c);
 			if(c == 's') printf("Pessoa eliminada!\n");
 			else if(c == 'n'){
 				printf("Processo cancelado.\n");
@@ -135,9 +140,9 @@ Pessoa removerNumero(Pessoa root, Pessoa P, Pessoa auxRoot){
 		do{
 			printf("Nome : %s", P->nome);
 			printf("Email: %s", P->email);
-			printf("RG: %d\n\n", P->rg);
+			printf("RG: %lld\n\n", P->rg);
 			printf("Pessoa achada, deseja realmente removê-la? <s> sim ou <n> não.\n");
-			scanf("%c", &c);
+			scanf("%c%*c", &c);
 			if(c == 's') printf("Pessoa eliminada!\n");
 			else if(c == 'n'){
 				printf("Processo cancelado.\n");
@@ -155,9 +160,9 @@ Pessoa removerNumero(Pessoa root, Pessoa P, Pessoa auxRoot){
 			printf("Pessoa achada: \n");
 			printf("Nome : %s", P->nome);
 			printf("Email: %s", P->email);
-			printf("RG: %d\n\n", P->rg);
+			printf("RG: %lld\n\n", P->rg);
 			printf("Deseja realmente removê-la? <s> sim ou <n> não.\n");
-			scanf("%c", &c);
+			scanf("%c%*c", &c);
 			if(c == 's') printf("Pessoa eliminada!\n");
 			else if(c == 'n'){
 				printf("Processo cancelado.\n");
@@ -175,24 +180,24 @@ Pessoa removerNumero(Pessoa root, Pessoa P, Pessoa auxRoot){
 }
 
 /**********************************************************************************
-	Parâmetros:	Recebe um ponteiro para a raiz mais acenstral da árvore = root
-				Recebe o valor do Telefone que deverá ser procurado = telefone
-	Return: 	Retorna NULL se chegou ao final sem encontrar o valor telefone
-				Retorna o ponteiro root quando é encontrado.
-
-	Esse método usa da recursividade para procurar por toda a àrvore binária.
-	Visto que a árvore implementada possui o lado esquerdo com menores valóres
-	que o lado direito, se a raiz atual do método não tiver o valor do telefone
-	ele irá descer para o lado esquerdo se for menor e para o lado direito se for
-	maior. Cada uma das duas chama a função search() novamente. O método irá parar
-	somente quando achar o valor ou quando chegar ao fim da procura sem resultados.
+*	Parâmetros:	Recebe um ponteiro para a raiz mais acenstral da árvore = root
+*				Recebe o valor do Telefone que deverá ser procurado = telefone
+*	Return: 	Retorna NULL se chegou ao final sem encontrar o valor telefone
+*				Retorna o ponteiro root quando é encontrado.
+*
+*	Esse método usa da recursividade para procurar por toda a àrvore binária.
+*	Visto que a árvore implementada possui o lado esquerdo com menores valóres
+*	que o lado direito, se a raiz atual do método não tiver o valor do telefone
+*	ele irá descer para o lado esquerdo se for menor e para o lado direito se for
+*	maior. Cada uma das duas chama a função search() novamente. O método irá parar
+*	somente quando achar o valor ou quando chegar ao fim da procura sem resultados.
 ************************************************************************************/
 
 Pessoa search(Pessoa root, int telefone){
 	if(root == NULL) return NULL;
 	else{
 		if(root->telefone == telefone) return root;
-		else if(telefone < root->telefone) search(root->esq ,telefone);
+		else if(telefone < root->telefone) search(root->esq, telefone);
 		else if(telefone > root->telefone) search(root->dir, telefone);
 	}
 }
@@ -204,7 +209,7 @@ void searchPreOrder(Pessoa root){
 	printf("Telefone: %d\n", root->telefone);
 	printf("Nome : %s", root->nome);
 	printf("Email: %s", root->email);
-	printf("RG: %d\n\n", root->rg);
+	printf("RG: %lld\n\n", root->rg);
 	searchPreOrder(root->esq);
 	searchPreOrder(root->dir);
 }
@@ -217,7 +222,7 @@ void searchInOrder(Pessoa root){
 	printf("Telefone: %d\n", root->telefone);
 	printf("Nome : %s", root->nome);
 	printf("Email: %s", root->email);
-	printf("RG: %d\n\n", root->rg);
+	printf("RG: %lld\n\n", root->rg);
 	searchInOrder(root->dir);
 }
 
@@ -230,5 +235,37 @@ void searchPosOrder(Pessoa root){
 	printf("Telefone: %d\n", root->telefone);
 	printf("Nome : %s", root->nome);
 	printf("Email: %s", root->email);
-	printf("RG: %d\n\n", root->rg);
+	printf("RG: %lld\n\n", root->rg);
+}
+
+// Trata todas as entradas para cadastro.
+int Exception(void *P, int exceptionNumber){
+	switch(exceptionNumber){
+		case 1:;
+			long long aux = *(long long *)P;
+			aux /= 10000000;
+			if(aux >= 10 || !aux) {
+				printf("\nNúmero tem que conter 8 dígitos.\n");
+				return 0;
+			} else if(aux != 3 && aux != 8 && aux != 9) {
+				printf("\nNúmero não válido, por favor, iniciar com dígitos '3', '8' ou '9'\n");
+				return 0;
+			}
+			break;
+		case 2:;
+			if(strlen(P) > 50) {
+				printf("\nNome ou email precisam possuir no máximo 50 caracteres.\n");
+				return 0;
+			}
+			break;
+		case 3:
+			aux = *(long long *)P;
+			aux /= 100000000000000;
+			if(aux >= 10) {
+				printf("\nO RG não pode ter mais do que 15 dígitos.\n");
+				return 0;
+			}
+			break;
+	}
+	return 1;
 }

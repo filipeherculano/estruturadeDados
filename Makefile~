@@ -1,0 +1,6 @@
+all: estruturadeDados.o
+	gcc estruturadeDados.o -o hello
+	./hello
+
+estruturadeDados.o: estruturadeDados.c
+	gcc -c estruturadeDados.c

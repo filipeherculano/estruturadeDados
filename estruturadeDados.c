@@ -14,19 +14,20 @@
 ***********************************************************************************************/
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
-// Incluindo biblioteca pessoal a fim de deixar mais organizado.
+// Incluindo biblioteca customizada a fim de deixar mais organizado!
 #include "estruturadeDados.h"
 
 /********************************************************************
 *	Define tamanho máximo que vai ser lido pela função Getline()
 *	para os arrays: nome e email.   						  
 ********************************************************************/
-size_t STRING_SIZE = 50;
+size_t STRING_SIZE = 52;
 
 int main(){
 	//	Aloca a memória e direciona o ponteiro "root".
-	Pessoa root = malloc(sizeof(struct pessoa));
+	Pessoa root = NULL;
 	//	isFirst será usado como identificador booleano.
 	int option, isFirst = 1;
 	do{
@@ -40,80 +41,108 @@ int main(){
 		printf("<4> Listar número.\n");
 		printf("<5> Sair.\n");
 		
-		do{		
-			scanf("%d%*c", &option);
+		do{	
+			// É tratado a excessão de quando o usuário entra com 
+			// uma string ao invés de um inteiro com a função atoi()	
+			char buffer[256];
+			fgets(buffer, 256, stdin);
+			option = atoi(buffer);
 			switch(option){
 				case 1:	;
-					/************************************************************************
-					*	Nesta seção, é alocada na memória um espaço para uma estrutura
-					*	que vai ter o "P" como ponteiro para referenciá-la. Recebe-se 
-					*	valores de nome, email e RG após receber um valor válido para 
-					*	o número do telefone. Logo após, verifica-se se é a primeira 
-					*	vez que é cadastrado uma pessoa, se for, este será referenciado
-					*	pelo ponteiro "root" a partir de agora. Se não for o primeiro,
-					*	a função cadastrarNumero() é chamada sem atribuir nada à ninguém
-					*	pois ela retorna NULL se cadastrar uma pessoa qualquer além da
-					*	raiz mais acenstral. Ao final, o ponteiro "P" é desalocado.
-					*	(Olhar método cadastrarNumero() e documentação dele na header estruturadeDados.h)
-					*************************************************************************/
+					/**************************************************************************
+					*	Nesta seção, aloca-se na memória o espaço para uma estrutura e é refe-
+					*	rênciado "P". Em cada do-while é pedido uma informação para o usuário 
+					*	de forma que só saia quando esta informação está de acordo com o proje-
+					*	to:
+					*
+					*	Telefone: 8 dígitos começando em 3, 8 ou 9. Não existir nenhum outro 
+					*	número cadastrado igual.
+					*	
+					*	Nome: No máximo 50 caracteres.
+					*
+					*	Email: No máximo 50 caracteres.
+					*
+					*	RG: no máximo 15 dígitos.
+					*	
+					*	Em todos os casos é chamado o método Exception() para se verificar tudos.
+					*
+					*	Ao final, é verificado se é o primeiro usuário da árvore quem está sendo 
+					*	cadastrado. Se for, o ponteiro root vai receber a referência para este en-
+					*	dereço na memória. Se não for, é só chamada o método cadastrarNumero().
+					****************************************************************************/
 					Pessoa P = malloc(sizeof(struct pessoa));
 					do{
 						printf("Digite seu número de telefone que NÃO ESTÁ CADASTRADO: \n");
-						scanf("%d%*c", &P->telefone);
-					}while(search(root, P->telefone) != NULL);
+						fgets(buffer, 256, stdin);
+						P->telefone = atoi(buffer);
+					}while(!Exception(&P->telefone, 1) || search(root, P->telefone) != NULL);
+
 					printf("Número pode ser cadastrado, agora insira:\n");
-					printf("\t->Seu nome: \n");
-					getline(&P->nome, &STRING_SIZE, stdin);
-					printf("\t->Seu email: \n");
-					getline(&P->email, &STRING_SIZE, stdin);
-					printf("\t->Seu RG: \n");
-					scanf("%d%*c", &P->rg);
-					if(isFirst) root = cadastrarNumero(P, root, isFirst);
- 					else cadastrarNumero(P, root, isFirst);
-					isFirst = 0;
-					free(P);
-					P = NULL;
+
+					do{	
+						printf("\t->Seu nome: \n");
+						getline(&P->nome, &STRING_SIZE, stdin);
+					}while(!Exception(P->nome, 2));
+
+					do{
+						printf("\t->Seu email: \n");
+						getline(&P->email, &STRING_SIZE, stdin);
+					}while(!Exception(P->email, 2));
+
+					do{
+						printf("\t->Seu RG: \n");
+						fgets(buffer, 256, stdin);
+						P->rg = atoll(buffer);
+					}while(!Exception(&P->rg, 3));
+
+
+					if(isFirst) {
+						root = cadastrarNumero(P, root, isFirst);
+						isFirst = 0;
+					} else cadastrarNumero(P, root, isFirst);
 					break;
 				case 2: ;
 					/***************************************************************************
 					*	Aqui, será pedido ao usuário para que insira um número de telefone
 					*	para ser pesquisado na estrutura. A função search() irá procurar
-					*	na árvore binária o valor especificado, se não for achado nenhum o
-					*	ponteiro "P" receberá NULL. Se for achado o ponteiro receberá o
-					*	local para onde deverá apontar na memória. Após isso, o if-else 
-					*	decidirá qual informação retornar ao usuário. Ao final, o ponteiro 
-					*	"P" é desalocado.
-					*	(Olhar método e search() documentação dele na header estruturadeDados.h)
+					*	na árvore binária o valor especificado. Se não for achado nenhum o
+					*	ponteiro "P" receberá NULL. Se for achado, o ponteiro "P" receberá
+					*	um ponteiro que aponta para o local na memória que contem o local
+					*	item procurado. Após isso, o if-else decidirá qual informação retornar 
+					*	ao usuário.
+					*	(Olhar método search() e documentação deste na header estruturadeDados.h)
 					***************************************************************************/
 					int tel;
 					printf("Insira o número para pesquisar.\n");
-					scanf("%d", &tel);
+					fgets(buffer, 256, stdin);
+					tel = atoi(buffer);
 					P = search(root, tel);
 					if(P != NULL) {
-						printf("\t->Pessoa achada:\n");
+						printf("\n\t->Pessoa achada:\n");
 						printf("Nome : %s", P->nome);
 						printf("Email: %s", P->email);
-						printf("RG: %d\n", P->rg);
+						printf("RG: %lld\n", P->rg);
 						printf("Telefone: %d\n\n", P->telefone);
 					} else printf("\t->Pessoa não cadastrada!\n");
-					free(P);
-					P = NULL;
 					break;
 				case 3:
 					/***************************************************************************
-					*	O usuário entrará com um telefone que será removido da estrutura. A 
+					*	O usuário insere um telefone que será removido da estrutura. A 
 					*	condição if-else decidirá se determinado número se encontra na árvo-
 					*	re. Se estiver presente, a função removerNumero() será chamada. A
 					*	variável auxiliar do tipo Pessoa irá receber o valor de retorno da 
 					*	função removerNumero() e logo após será verificado se é NULL ou não.
 					*	A função removerNumero() retorna NULL se o nó removido na árvore não
-					*	é a raiz mais ancestral possível, ou origem. Se não for NULL, o pon-
-					*	teiro "root" irá receber o aux, pois a raiz mais ancestral foi removi-
-					*	da e precisa-se que o root do código no main seja atualizado.
+					*	é a raiz mais ancestral possível, ou origem. Se a função removerNumero()
+					*	remove o acenstral mais antigo, ela retorna um ponteiro para o NOVO
+					*	ancestral mais antigo. Aqui usamos uma atribuição para o nosso root para
+					*	atualizar este valor, pois foi removido o anterior.
 					*	(Olhar método removerNumero() e documentação dele na header estruturadeDados.h)
-					****************************************************************************/
-					printf("Insira um número para ser removido.\n");
-					scanf("%d%*c", &tel);
+					*****************************************************************************/
+					printf("\nInsira um número para ser removido.\n");
+					char b[256];
+					fgets(b, 256, stdin);
+					tel = atoi(b);
 					if(search(root, tel) == NULL) printf("Pessoa não cadastrada!\n");
 					else {
 						Pessoa aux = removerNumero(root, search(root, tel),root);
@@ -123,11 +152,13 @@ int main(){
 				case 4:;
 					//	O usuário irá entrar com o tipo de percurso que ele quer observar.
 					int op;
-					printf("Selecione uma opção de listagem.\n");
+					printf("\nSelecione uma opção de listagem.\n");
 					printf("<1> Percurso em pré-ordem.\n");
 					printf("<2> Percurso em ordem simétrica.\n");
-					printf("<3> Percurso em pós-ordem.\n");
-					scanf("%d%*c", &op);
+					printf("<3> Percurso em pós-ordem.\n\n");
+					fgets(buffer, 256, stdin);
+					op = atoi(buffer);
+					if(root == NULL) printf("\nNão existe árvore!\n");;
 					switch(op){
 						case 1:
 							searchPreOrder(root);
@@ -141,7 +172,6 @@ int main(){
 						default:
 							printf("\nOpção não cadastrada! Por favor, tente novamente.\n");
 					}
-
 					break;
 				case 5:
 					printf("---------------Fim de execução!---------------\n");
